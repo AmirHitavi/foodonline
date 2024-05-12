@@ -2,12 +2,14 @@ from django.contrib import auth, messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import redirect, render
 from django.template.defaultfilters import slugify
+from django.utils.http import urlsafe_base64_decode
+from django.contrib.auth.tokens import default_token_generator
 
 from accounts import forms as accounts_forms
 from accounts import models as accounts_models
 from vendor import forms as vendor_forms
 
-from .utils import check_role_customer, check_role_vendor, detect_user
+from .utils import check_role_customer, check_role_vendor, detect_user, send_verification_email
 
 
 def index(request):
@@ -29,6 +31,11 @@ def register_user(request):
             user.set_password(password)
             user.role = accounts_models.User.CUSTOMER
             user.save()
+
+            # send verification email
+            mail_subject = "Please activate your account"
+            email_template = "emails/account_verification_email.html"
+            send_verification_email(request, user, mail_subject, email_template)
 
             messages.success(request, "Your account has been created successfully!")
             return redirect("login")
@@ -65,10 +72,15 @@ def register_vendor(request):
             vendor.slug = f"{slugify(vendor.name)}-{str(user.pk)}"
             vendor.save()
 
-        messages.success(
-            request,
-            "Your account has been registered successfully!\nPlease wait for the approval.",
-        )
+            # send verification email
+            mail_subject = "Please activate your account"
+            email_template = "emails/account_verification_email.html"
+            send_verification_email(request, user, mail_subject, email_template)
+
+            messages.success(
+                request,
+                "Your account has been registered successfully!\nPlease wait for the approval.",
+            )
 
         return redirect("login")
 
@@ -122,3 +134,21 @@ def customer_dashboard(request):
 @user_passes_test(check_role_vendor)
 def vendor_dashboard(request):
     return render(request, "accounts/vendor_dashboard.html")
+
+
+def activate(request, uidb64, token):
+    try:
+        uid = urlsafe_base64_decode(uidb64).decode()
+        user = accounts_models.User._default_manager.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, accounts_models.User.DoesNotExist):
+        user = None
+
+    if user is not None and default_token_generator.check_token(user, token):
+        user.is_active = True
+        user.save()
+
+        messages.success(request, "Congratulations! Your account is activated.")
+        return redirect('my-account')
+    else:
+        messages.error(request, 'Invalid activation link.')
+        return redirect('my-account')
