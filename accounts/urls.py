@@ -10,5 +10,12 @@ urlpatterns = [
     path("my-account/", views.my_account, name="my-account"),
     path("customer-dashboard/", views.customer_dashboard, name="customer-dashboard"),
     path("vendor-dashboard/", views.vendor_dashboard, name="vendor-dashboard"),
-    path("activate/<uidb64>/<token>", views.activate, name="activate")
+    path("activate/<uidb64>/<token>", views.activate, name="activate"),
+    path("forgot-password/", views.forgot_password, name="forgot-password"),
+    path(
+        "forgot-password-validation/<uidb64>/<token>/",
+        views.forgot_password_validation,
+        name="forgot-password-validation",
+    ),
+    path("reset-password/", views.reset_password, name="reset-password")
 ]

@@ -9,7 +9,12 @@ from accounts import forms as accounts_forms
 from accounts import models as accounts_models
 from vendor import forms as vendor_forms
 
-from .utils import check_role_customer, check_role_vendor, detect_user, send_verification_email
+from .utils import (
+    check_role_customer,
+    check_role_vendor,
+    detect_user,
+    send_verification_email,
+)
 
 
 def index(request):
@@ -148,7 +153,63 @@ def activate(request, uidb64, token):
         user.save()
 
         messages.success(request, "Congratulations! Your account is activated.")
-        return redirect('my-account')
+        return redirect("my-account")
     else:
-        messages.error(request, 'Invalid activation link.')
+        messages.error(request, "Invalid activation link.")
+        return redirect("my-account")
+
+
+def forgot_password(request):
+    if request.method == "POST":
+        email = request.POST.get("email")
+
+        if accounts_models.User.objects.filter(email=email).exists:
+            user = accounts_models.User.objects.get(email__exact=email)
+
+            mail_subject = "Reset Your Password"
+            email_template = "emails/reset_password.html"
+            send_verification_email(request, user, mail_subject, email_template)
+
+            messages.success(request, 'Password reset link has been sent to your email address.')
+            return redirect('login')
+        else:
+            messages.error(request, "Account does not exist!")
+            return redirect('forgot-password')
+    return render(request, 'accounts/forgot_password.html')
+
+
+def forgot_password_validation(request, uidb64, token):
+    try:
+        uid = urlsafe_base64_decode(uidb64).decode()
+        user = accounts_models.User.objects.get(pk=uid)
+    except (ValueError, TypeError, KeyError, OverflowError, accounts_models.User.DoesNotExist):
+        user = None
+
+    if user is not None and default_token_generator.check_token(user, token):
+        request.session['uid'] = uid
+        messages.info(request, 'Please reset your password')
+        return redirect('reset-password')
+    else:
+        messages.error(request, 'This link has been expired!')
         return redirect('my-account')
+
+
+def reset_password(request):
+    if request.method == 'POST':
+        password = request.POST.get('password')
+        confirm_password = request.POST.get('confirm_password')
+
+        if password and confirm_password and password == confirm_password:
+            pk = request.session.get("uid")
+            user = accounts_models.User.objects.get(pk=pk)
+            user.set_password(password)
+            user.is_active = True
+            user.save()
+
+            messages.success(request, 'Password reset successful')
+            return redirect('login')
+        else:
+            messages.error(request, 'Password does not match')
+            return redirect('reset-password')
+
+    return render(request, 'accounts/reset_password.html')
