@@ -1,0 +1,18 @@
+<div class="user-account-nav user-account-sidebar">
+    <div class="user-nav-list">
+        <ul>
+            <li class="{% if '/customer/' == request.path or '/customer-dashboard/' == request.path %}active{% endif %}">
+                <a href="#"><i class="icon-dashboard3"></i>Dashboard</a>
+            </li>
+            <li class="{% if '/customer/my-orders/' == request.path or '/customer/order-details/' == request.path %} active {% endif %}">
+                <a href="#"><i class="icon-building"></i>My Orders</a>
+            </li>
+            <li class="{% if '/customer/profile/' == request.path %} active {% endif %}">
+                <a href="#"><i class="icon-menu5"></i>Profile Settings</a>
+            </li>
+            <li>
+                <a class="logout-btn" href="#"><i class="icon-log-out"></i>Signout</a>
+            </li>
+        </ul>
+    </div>
+</div>
