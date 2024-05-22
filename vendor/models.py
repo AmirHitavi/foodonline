@@ -25,6 +25,9 @@ class Vendor(models.Model):
     def __str__(self):
         return self.name
 
+    def clean(self):
+        self.name = self.name.capitalize()
+
     def save(self, *args, **kwargs):
         if self.pk is not None:
             original_object = Vendor.objects.get(pk=self.pk)
