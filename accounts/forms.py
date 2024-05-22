@@ -1,6 +1,7 @@
 from django import forms
-from accounts.validators import valid_image_extensions
+
 from accounts import models as accounts_models
+from accounts.validators import valid_image_extensions
 
 
 class RegisterUserForm(forms.ModelForm):
@@ -24,12 +25,20 @@ class RegisterUserForm(forms.ModelForm):
 
 class UserProfileForm(forms.ModelForm):
 
-    address = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'start typing ...', 'required': 'required'}))
+    address = forms.CharField(
+        widget=forms.TextInput(
+            attrs={"placeholder": "start typing ...", "required": "required"}
+        )
+    )
 
-    profile_picture = forms.FileField(widget=forms.FileInput(attrs={'class': 'btb btn-info'}),
-                                      validators=[valid_image_extensions])
-    cover_photo = forms.FileField(widget=forms.FileInput(attrs={'class': 'btn btn-info'}),
-                                  validators=[valid_image_extensions])
+    profile_picture = forms.FileField(
+        widget=forms.FileInput(attrs={"class": "btb btn-info"}),
+        validators=[valid_image_extensions],
+    )
+    cover_photo = forms.FileField(
+        widget=forms.FileInput(attrs={"class": "btn btn-info"}),
+        validators=[valid_image_extensions],
+    )
 
     class Meta:
         model = accounts_models.UserProfile
@@ -49,4 +58,4 @@ class UserProfileForm(forms.ModelForm):
         super(UserProfileForm, self).__init__(*args, **kwargs)
         for field in self.fields:
             if field in ["latitude", "longitude"]:
-                self.fields[field].widget.attrs["readonly"] = 'readonly'
+                self.fields[field].widget.attrs["readonly"] = "readonly"

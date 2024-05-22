@@ -1,9 +1,9 @@
 from django.contrib import auth, messages
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.tokens import default_token_generator
 from django.shortcuts import redirect, render
 from django.template.defaultfilters import slugify
 from django.utils.http import urlsafe_base64_decode
-from django.contrib.auth.tokens import default_token_generator
 
 from accounts import forms as accounts_forms
 from accounts import models as accounts_models
