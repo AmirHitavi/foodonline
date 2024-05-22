@@ -52,7 +52,7 @@ def register_user(request):
 
 def register_vendor(request):
     user_form = accounts_forms.RegisterUserForm()
-    vendor_form = vendor_forms.VendorRegisterForm()
+    vendor_form = vendor_forms.VendorForm()
 
     if request.user.is_authenticated:
         messages.warning(request, "You already signed up.")
@@ -60,7 +60,7 @@ def register_vendor(request):
 
     if request.method == "POST":
         user_form = accounts_forms.RegisterUserForm(request.POST)
-        vendor_form = vendor_forms.VendorRegisterForm(request.POST, request.FILES)
+        vendor_form = vendor_forms.VendorForm(request.POST, request.FILES)
         if user_form.is_valid() and vendor_form.is_valid():
             # save the user instance
             user_password = user_form.cleaned_data["password"]
@@ -170,34 +170,42 @@ def forgot_password(request):
             email_template = "emails/reset_password.html"
             send_verification_email(request, user, mail_subject, email_template)
 
-            messages.success(request, 'Password reset link has been sent to your email address.')
-            return redirect('login')
+            messages.success(
+                request, "Password reset link has been sent to your email address."
+            )
+            return redirect("login")
         else:
             messages.error(request, "Account does not exist!")
-            return redirect('forgot-password')
-    return render(request, 'accounts/forgot_password.html')
+            return redirect("forgot-password")
+    return render(request, "accounts/forgot_password.html")
 
 
 def forgot_password_validation(request, uidb64, token):
     try:
         uid = urlsafe_base64_decode(uidb64).decode()
         user = accounts_models.User.objects.get(pk=uid)
-    except (ValueError, TypeError, KeyError, OverflowError, accounts_models.User.DoesNotExist):
+    except (
+        ValueError,
+        TypeError,
+        KeyError,
+        OverflowError,
+        accounts_models.User.DoesNotExist,
+    ):
         user = None
 
     if user is not None and default_token_generator.check_token(user, token):
-        request.session['uid'] = uid
-        messages.info(request, 'Please reset your password')
-        return redirect('reset-password')
+        request.session["uid"] = uid
+        messages.info(request, "Please reset your password")
+        return redirect("reset-password")
     else:
-        messages.error(request, 'This link has been expired!')
-        return redirect('my-account')
+        messages.error(request, "This link has been expired!")
+        return redirect("my-account")
 
 
 def reset_password(request):
-    if request.method == 'POST':
-        password = request.POST.get('password')
-        confirm_password = request.POST.get('confirm_password')
+    if request.method == "POST":
+        password = request.POST.get("password")
+        confirm_password = request.POST.get("confirm_password")
 
         if password and confirm_password and password == confirm_password:
             pk = request.session.get("uid")
@@ -206,10 +214,10 @@ def reset_password(request):
             user.is_active = True
             user.save()
 
-            messages.success(request, 'Password reset successful')
-            return redirect('login')
+            messages.success(request, "Password reset successful")
+            return redirect("login")
         else:
-            messages.error(request, 'Password does not match')
-            return redirect('reset-password')
+            messages.error(request, "Password does not match")
+            return redirect("reset-password")
 
-    return render(request, 'accounts/reset_password.html')
+    return render(request, "accounts/reset_password.html")

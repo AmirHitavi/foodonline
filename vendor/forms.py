@@ -4,7 +4,7 @@ from accounts.validators import valid_image_extensions
 from vendor import models as vendor_models
 
 
-class VendorRegisterForm(forms.ModelForm):
+class VendorForm(forms.ModelForm):
 
     license = forms.FileField(
         widget=forms.FileInput(attrs={"class": "btn btn-info"}),

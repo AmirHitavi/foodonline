@@ -30,10 +30,7 @@ class Vendor(models.Model):
             original_object = Vendor.objects.get(pk=self.pk)
             if original_object.is_approved != self.is_approved:
                 email_template = "accounts/emails/admin_approval_email.html"
-                context = {
-                    "user": self.user,
-                    "is_approved": self.is_approved
-                }
+                context = {"user": self.user, "is_approved": self.is_approved}
                 if self.is_approved:
                     # send notification email
                     mail_subject = "Congratulations! Your restaurant has been approved."
