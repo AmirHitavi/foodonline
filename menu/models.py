@@ -1,4 +1,5 @@
 from django.db import models
+
 from vendor import models as vendor_models
 
 # Create your models here.
@@ -7,8 +8,8 @@ from vendor import models as vendor_models
 class Category(models.Model):
 
     class Meta:
-        verbose_name = 'Category'
-        verbose_name_plural = 'Categories'
+        verbose_name = "Category"
+        verbose_name_plural = "Categories"
 
     vendor = models.ForeignKey(vendor_models.Vendor, on_delete=models.CASCADE)
     name = models.CharField(max_length=255, unique=True)
@@ -32,7 +33,7 @@ class FoodItem(models.Model):
     slug = models.SlugField(max_length=255, unique=True)
     description = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    images = models.ImageField(upload_to='vendor/food_images')
+    image = models.ImageField(upload_to="vendor/food_images")
     is_available = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)

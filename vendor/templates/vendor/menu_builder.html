@@ -21,11 +21,11 @@
                                 <hr>
                                 <h5>Menu Categories</h5>
                                 {% if categories %}
-                                    <a href="" class="btn btn-success float-right m-1">
+                                     <a href="{% url 'add-food' %}" class="btn btn-success float-right m-1">
                                         <i class="fa fa-plus" aria-hidden="true"></i>
                                         Add Food
                                     </a>
-                                    <a href="{% url 'add-category' %}" class="btn btn-success float-right m-1">
+                                    <a href="{% url 'add-category' %}" class="btn btn-info float-right m-1">
                                         <i class="fa fa-plus" aria-hidden="true"></i>
                                         Add Category
                                     </a>

@@ -19,6 +19,8 @@
                             <div class="user-holder">
                                 <h5 class="text-uppercase">Build Your Food Menu</h5>
                                 <hr>
+                                {% include 'includes/back.html' %}
+                                <br>
                                 <h6>Modify {{ category.name }}'s Category</h6>
                                  <form method="post" action="{% url 'edit-category' category.slug %}">
                                     {% csrf_token %}
