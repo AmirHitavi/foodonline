@@ -21,9 +21,12 @@ from django.contrib import admin
 from django.urls import include, path
 
 from accounts.views import index
+from marketplace.views import cart
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", index, name="index"),
+    path("cart/", cart, name="cart"),
     path("accounts/", include("accounts.urls")),
+    path("marketplace/", include("marketplace.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

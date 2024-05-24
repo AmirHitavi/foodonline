@@ -7,7 +7,7 @@ from .models import User, UserProfile
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    pass
+    exclude = ["password"]
 
 
 @admin.register(UserProfile)

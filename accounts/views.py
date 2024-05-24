@@ -8,6 +8,7 @@ from django.utils.http import urlsafe_base64_decode
 from accounts import forms as accounts_forms
 from accounts import models as accounts_models
 from vendor import forms as vendor_forms
+from vendor import models as vendor_models
 
 from .utils import (
     check_role_customer,
@@ -18,7 +19,13 @@ from .utils import (
 
 
 def index(request):
-    return render(request, "accounts/index.html")
+    vendors = vendor_models.Vendor.objects.filter(
+        user__is_active=True, is_approved=True
+    )[:8]
+    print(vendors)
+
+    context = {"top_vendors": vendors, "popular_vendors": vendors}
+    return render(request, "accounts/index.html", context)
 
 
 def register_user(request):

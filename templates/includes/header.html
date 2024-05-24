@@ -2,7 +2,7 @@
 <!-- Header Start -->
 <header id="header">
     <div class="main-header">
-        <div class="container">
+        <div class="container-fluid">
             <div class="row">
                 <div class="col-lg-8 col-md-8 col-sm-12 col-xs-12">
                     <div class="logo">
@@ -27,15 +27,38 @@
                 </div>
                 <div class="col-lg-4 col-md-4 col-sm-12 col-xs-12">
                     <div class="login-option">
-                        <a class="cs-color cs-popup-joinus-btn login-popup"  data-toggle="modal" href="{% url 'login' %}">
-                            Login /
+                        <a href="{% url 'cart' %}">
+                            <i class="fa fa-shopping-cart text-danger" style="font-size: 20px;"></i>
+                            <span class="badge badge-warning" 
+                                  id="cart-counter" 
+                                  style="border-radius: 50px; position: relative; bottom: 10px; left: -5px;"
+                            >
+                             {{ cart_counter }}   
+                            </span>
                         </a>
-                        <a class="cs-color cs-popup-joinus-btn login-popup ml-0" href="{% url 'register-user' %}">
-                            Register
+                        <a class="btn btn-outline-danger text-uppercase font-weight-bold" 
+                           href="{% url 'marketplace' %}">Marketplace
                         </a>
-                        <a class="get-start-btn" href="{% url 'register-vendor' %}">
-                            Register Restaurant 
-                        </a>
+                        {% if user.is_authenticated %}
+                             <a class="cs-color cs-popup-joinus-btn login-popup"  data-toggle="modal" href="{% url 'my-account' %}">
+                                My Account 
+                            </a>
+                             <a class="cs-color cs-popup-joinus-btn login-popup text-danger"  data-toggle="modal" href="{% url 'logout' %}">
+                                Logout 
+                            </a>
+      
+                        {% else %}
+                            <a class="cs-color cs-popup-joinus-btn login-popup"  data-toggle="modal" href="{% url 'login' %}">
+                                Login /
+                            </a>
+                            <a class="cs-color cs-popup-joinus-btn login-popup ml-0" href="{% url 'register-user' %}">
+                                Register
+                            </a>
+                            <a class="get-start-btn" href="{% url 'register-vendor' %}">
+                                Register Restaurant 
+                            </a>   
+                        {% endif %}
+                    
                     </div>
                 </div>
             </div>

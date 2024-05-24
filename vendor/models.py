@@ -32,7 +32,7 @@ class Vendor(models.Model):
         if self.pk is not None:
             original_object = Vendor.objects.get(pk=self.pk)
             if original_object.is_approved != self.is_approved:
-                email_template = "accounts/emails/admin_approval_email.html"
+                email_template = "emails/admin_approval_email.html"
                 context = {"user": self.user, "is_approved": self.is_approved}
                 if self.is_approved:
                     # send notification email

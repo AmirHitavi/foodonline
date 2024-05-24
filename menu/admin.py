@@ -7,6 +7,7 @@ from .models import Category, FoodItem
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
+    # TODO: Fix slug field in admin panel
     prepopulated_fields = {"slug": ("name",)}
     list_display = ["name", "vendor", "modified_at"]
     search_fields = ["name", "vendor__name"]
@@ -14,6 +15,7 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(FoodItem)
 class FoodItemAdmin(admin.ModelAdmin):
+    # TODO: Fix slug field in admin panel
     prepopulated_fields = {"slug": ("food_title",)}
     list_display = [
         "food_title",

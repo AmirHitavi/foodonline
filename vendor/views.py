@@ -88,7 +88,7 @@ def add_category(request):
             name = form.cleaned_data["name"]
             category = form.save(commit=False)
             category.vendor = vendor
-            category.slug = f"{slugify(name)}-{category.pk}"
+            category.slug = f"{slugify(name)}-{category.id}"
             category.save()
 
             messages.success(request, "Category added successfully!")
