@@ -1,8 +1,11 @@
+from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
-from django.db.models import Prefetch
+from django.db.models import Prefetch, Q
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
-
+from django.contrib.gis.geos import GEOSGeometry
+from django.contrib.gis.measure import D
+from django.contrib.gis.db.models.functions import Distance
 from marketplace import context_processors as market_context_processors
 from marketplace import models as market_models
 from menu import models as menu_models
@@ -213,3 +216,43 @@ def delete_cart(request, cart_id):
         return JsonResponse(
             {"status": "login_required", "message": "Please login to continue"}
         )
+
+
+def search(request):
+    if not 'address' in request.GET or not 'keyword' in request.GET or not 'lat' in request.GET or not 'long' in request.GET or not 'radius' in request.GET or not '':
+        return redirect('marketplace')
+    else:
+        keyword = request.GET.get("keyword")
+        address = request.GET.get("address")
+        latitude = request.GET.get("lat")
+        longitude = request.GET.get("long")
+        radius = request.GET.get("radius")
+
+        # get vendor ids that has the food item the user is looking for
+        fetch_vendors_by_food_items = menu_models.FoodItem.objects.filter(
+            food_title__icontains=keyword, is_available=True
+        ).values_list("vendor", flat=True)
+
+        vendors = vendor_models.Vendor.objects.filter(
+            Q(id__in=fetch_vendors_by_food_items)
+            | Q(name__icontains=keyword, user__is_active=True, is_approved=True)
+        )
+
+        if latitude and longitude and radius:
+            point = GEOSGeometry(f"POINT({longitude} {latitude})", srid=4326)
+
+            vendors = vendor_models.Vendor.objects.filter(
+                Q(id__in=fetch_vendors_by_food_items) |
+                Q(name__icontains=keyword, is_approved=True, user__is_active=True),
+                user_profile__location__distance__lte=(point, D(km=radius))
+            ).annotate(distance=Distance('user_profile__location', point)).order_by('distance')
+
+            for vendor in vendors:
+                vendor.kms = round(vendor.distance.km, 1)
+        context = {
+            "vendors": vendors,
+            "vendors_count": vendors.count(),
+            "source_location": address
+        }
+
+        return render(request, "marketplace/marketplace.html", context)
