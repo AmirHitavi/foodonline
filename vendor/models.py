@@ -1,4 +1,4 @@
-from datetime import time, datetime, date
+from datetime import date, datetime, time
 
 from django.db import models
 
@@ -56,12 +56,13 @@ class Vendor(models.Model):
 
         is_open = None
         for current_hour in current_hours:
-            start = current_hour.from_hour
-            end = current_hour.to_hour
+            if not current_hour.is_closed:
+                start = current_hour.from_hour
+                end = current_hour.to_hour
 
-            if start <= now <= end:
-                is_open = True
-                break
+                if start <= now <= end:
+                    is_open = True
+                    break
         else:
             is_open = False
         return is_open

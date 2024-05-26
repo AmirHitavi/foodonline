@@ -85,10 +85,15 @@ $(document).ready(function() {
         }
     }
 
-    function applyCartAmounts(sub_total, tax, grant_total) {
+    function applyCartAmounts(sub_total, tax_dict, grant_total) {
         $("#sub_total").html(sub_total);
-        $("#tax").html(tax);
         $("#grand_total").html(grant_total);
+
+        for (key1 in tax_dict) {
+           for (key2 in tax_dict[key1]) {
+               $(`#tax-${key1}`).html(tax_dict[key1][key2]);
+           }
+        }
 
     }
 
@@ -117,7 +122,7 @@ $(document).ready(function() {
                 if (response.status === 'success') {
                     $("#cart-counter").html(response.cart_counter["cart_counter"]);
                     $(`#qty-${food_id}`).html(response.qty);
-                    applyCartAmounts(response.cart_amounts["sub_total"], response.cart_amounts["tax"], response.cart_amounts["grand_total"]);
+                    applyCartAmounts(response.cart_amounts["sub_total"], response.cart_amounts["tax_dict"], response.cart_amounts["grand_total"]);
                 } else if (response.status === 'failed') {
                     Swal.fire({
                         title: 'Failure',
@@ -157,7 +162,7 @@ $(document).ready(function() {
                     $("#cart-counter").html(response.cart_counter["cart_counter"]);
                     removeCartItem(response.qty, cart_id);
                     checkCartCounter();
-                    applyCartAmounts(response.cart_amounts["sub_total"], response.cart_amounts["tax"], response.cart_amounts["grand_total"]);
+                    applyCartAmounts(response.cart_amounts["sub_total"], response.cart_amounts["tax_dict"], response.cart_amounts["grand_total"]);
                 } else if (response.status === 'failed') {
                     Swal.fire({
                         title: 'Failure',
@@ -202,7 +207,7 @@ $(document).ready(function() {
                     $("#cart-counter").html(response.cart_counter["cart_counter"]);
                     removeCartItem(0, cart_id);
                     checkCartCounter();
-                    applyCartAmounts(response.cart_amounts["sub_total"], response.cart_amounts["tax"], response.cart_amounts["grand_total"]);
+                    applyCartAmounts(response.cart_amounts["sub_total"], response.cart_amounts["tax_dict"], response.cart_amounts["grand_total"]);
                 } else if (response.status === 'failed') {
                     Swal.fire({
                         title: "Failure",

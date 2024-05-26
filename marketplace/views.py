@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.contrib.auth.decorators import login_required
 from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.geos import GEOSGeometry
@@ -5,8 +7,6 @@ from django.contrib.gis.measure import D
 from django.db.models import Prefetch, Q
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
-from datetime import datetime
-
 
 from marketplace import context_processors as market_context_processors
 from marketplace import models as market_models
@@ -29,10 +29,14 @@ def marketplace(request):
 def vendor_details(request, slug):
     vendor = get_object_or_404(vendor_models.Vendor, slug=slug)
 
-    opening_hours = vendor_models.OpeningHour.objects.filter(vendor=vendor).order_by("day", "-from_hour")
+    opening_hours = vendor_models.OpeningHour.objects.filter(vendor=vendor).order_by(
+        "day", "-from_hour"
+    )
 
     today = datetime.today().isoweekday()
-    current_opening_hours = vendor_models.OpeningHour.objects.filter(vendor=vendor, day=today).order_by('day', "-from_hour")
+    current_opening_hours = vendor_models.OpeningHour.objects.filter(
+        vendor=vendor, day=today
+    ).order_by("day", "-from_hour")
 
     categories = menu_models.Category.objects.prefetch_related(
         Prefetch(
@@ -52,7 +56,7 @@ def vendor_details(request, slug):
         "opening_hours": opening_hours,
         "current_opening_hours": current_opening_hours,
         "categories": categories,
-        "cart_items": cart_items
+        "cart_items": cart_items,
     }
     return render(request, "marketplace/vendor_details.html", context)
 
