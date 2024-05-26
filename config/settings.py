@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     "vendor.apps.VendorConfig",
     "menu.apps.MenuConfig",
     "marketplace.apps.MarketplaceConfig",
+    "customer.apps.CustomerConfig"
 ]
 
 MIDDLEWARE = [
