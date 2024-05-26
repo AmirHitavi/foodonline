@@ -17,8 +17,8 @@
                         <ul>
                             <li class="location-has-children choose-location">
                                 <form action="#">
-                                    <input type="text" value="" name="location" placeholder="Enter your delivery location" autocomplete="off">
-                                    <span id="foodbakery_radius_location_open" class="foodbakery-radius-location"><i class="icon-target5"></i></span>
+                                    <input type="text" id="location" value="" name="location" placeholder="Your current location" autocomplete="off">
+                                    <span id="foodbakery_radius_location_open" onclick="getLocation()"  class="foodbakery-radius-location"><i class="icon-target5"></i></span>
                                 </form>
 
                             </li>
@@ -66,3 +66,40 @@
     </div>
 </header>
 <!-- Header End -->
+  <script>
+      const locationElement = document.getElementById('location');
+      let current_location = sessionStorage.getItem('current_location');
+
+      if (current_location) {
+          locationElement.value = current_location;
+      } else {
+          locationElement.value = '';
+      }
+
+      function getLocation() {
+          if (navigator.geolocation) {
+              navigator.geolocation.getCurrentPosition(showPosition);
+          } else {
+              locationElement.innerHTML = "Geolocation is not supported by this browser.";
+          }
+      }
+      
+      function showPosition(position) {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          
+          const GEO_API_KEY = "{{ GEO_API_KEY }}";
+          const url = `https://api.geoapify.com/v1/geocode/reverse?lat=${lat}&lon=${lng}&format=json&apiKey=${GEO_API_KEY}`
+          
+          $.ajax({
+              type: "GET",
+              url: url,
+              success: function (response) {
+                  const current_location = response.results[0].formatted;
+                  $('#location').html(current_location);
+                  sessionStorage.setItem("current_location", current_location);
+                  window.location = `?lat=${lat}&lng=${lng}`;
+              }
+          });
+      }
+</script> 

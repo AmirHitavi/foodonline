@@ -35,8 +35,14 @@
                                 <div class="text-holder">
                                     <span class="restaurant-title">{{ vendor.name | title }}</span>
                                     <div class="text">
-                                        <i class="icon-local_pizza"></i>
-                                        <p>Apple Juice</p>
+                                        {% if vendor.user_profile.address %}
+                                            <i class="icon-location"></i>
+                                            <address style="color: white">
+                                                <strong>
+                                                    {{ vendor.user_profile.address }}
+                                                </strong>
+                                            </address>
+                                        {% endif %}
                                     </div>
                                 </div>
                             </div>

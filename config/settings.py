@@ -78,6 +78,7 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "vendor.context_processors.get_vendor",
                 "accounts.context_processors.get_google_api",
+                "accounts.context_processors.get_geo_api",
                 "marketplace.context_processors.get_cart_counter",
                 "marketplace.context_processors.get_cart_amounts",
             ],
@@ -170,3 +171,6 @@ DEFAULT_FROM_EMAIL = config("DEFAULT_FROM_EMAIL")
 
 # Google API
 GOOGLE_API = config("GOOGLE_API")
+
+# Geo API
+GEO_API_KEY = config("GEO_API_KEY")

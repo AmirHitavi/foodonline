@@ -39,15 +39,9 @@
                                                 <span class="restaurant-status close"><em class="bookmarkRibbon"></em>Close</span>
                                             </div>
                                             <div class="text-holder">
-                                                <div class="list-rating">
-                                                    <div class="rating-star">
-                                                        <span class="rating-box" style="width: 100%;"></span>
-                                                    </div>
-                                                    <span class="reviews">(1)</span>
-                                                </div>
                                                 <div class="post-title">
                                                     <h5>
-                                                        <a href="">{{ vendor.name | title }}</a>
+                                                        <a href="{% url 'vendor-details' vendor.slug %}">{{ vendor.name | title }}</a>
                                                     </h5>
                                                 </div>
                                                 {% if vendor.user_profile.address %}
