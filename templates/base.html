@@ -25,8 +25,10 @@
 	<script src="{% static 'assets/js/bootstrap.js' %}"></script>
     <script src="{% static 'assets/js/custom.js' %}"></script>
     <!-- Google -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=&libraries=places&callback=initAutoComplete" defer></script>
-	<!-- Font Awesome -->
+    {% if '/' == request.path or 'profile' in request.path %}
+        <script src="https://maps.googleapis.com/maps/api/js?key=&libraries=places&callback=initAutoComplete" defer></script>
+	{% endif %}
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <!-- Sweet Alert -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

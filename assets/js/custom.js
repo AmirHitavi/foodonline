@@ -213,4 +213,112 @@ $(document).ready(function() {
             }
         })
     })
+
+    // Opening Hour
+    $(".add-opening-hour").on('click', function(e) {
+        e.preventDefault();
+
+        const day = document.getElementById('id_day').value;
+        const from_hour = document.getElementById('id_from_hour').value;
+        const to_hour = document.getElementById('id_to_hour').value;
+        const is_closed = document.getElementById('id_is_closed').checked;
+        const csrf_token = document.getElementsByName('csrfmiddlewaretoken')[0].value;
+        const url = document.getElementById("add-opening-hour-url").value;
+        let data;
+
+        if (is_closed) {
+            if (day) {
+                data = {
+                    'day': day,
+                    'from_hour': from_hour,
+                    'to_hour': to_hour,
+                    'is_closed': 'True',
+                    'csrfmiddlewaretoken': csrf_token
+                }
+            } else {
+                Swal.fire({
+                    title: "Field empty",
+                    text: "Please fill day field",
+                    icon: "warning"
+                });
+                return;
+            }
+        } else {
+            if (day && from_hour && to_hour) {
+                data = {
+                    'day': day,
+                    'from_hour': from_hour,
+                    'to_hour': to_hour,
+                    'is_closed': 'False',
+                    'csrfmiddlewaretoken': csrf_token
+                }
+            } else {
+                Swal.fire({
+                    title: "Fields empty",
+                    text: "Please fill the empty fields",
+                    icon: "warning"
+                });
+                return;
+            }
+        }
+        console.log(data);
+        $.ajax({
+            type: "POST",
+            url: url,
+            data: data,
+            success: function (response) {
+                console.log(response)
+                let html
+                if (response.status === 'success') {
+                    if (response.is_closed) {
+                        html = `<tr id="hour-${response.id}"><td><b>${response.day.toUpperCase()}</b></td><td>Closed</td><td><a href="/accounts/vendor/opening-hour/delete/${response.id}" class="delete-opening-hour" data-url="/accounts/vendor/opening-hour/delete/${response.id}">Remove</a></td><tr>`
+                    } else {
+                        html = `<tr id="hour-${response.id}"><td><b>${response.day.toUpperCase()}</b></td><td>${response.from_hour}-${response.to_hour}</td><td><a href="/accounts/vendor/opening-hour/delete/${response.id}" class="delete-opening-hour" data-url="/accounts/vendor/opening-hour/delete/${response.id}">Remove</a></td></tr>`
+                    }
+                    $('.opening_hours').append(html);
+                    $('#opening_hours').trigger("reset");
+                } else  {
+                    Swal.fire({
+                        title: 'Failure',
+                        text: response.message,
+                        icon: 'error'
+                    });
+                }
+            }
+        })
+    })
+
+    /* $(".delete-opening-hour").on('click', function(e) {
+        e.preventDefault();
+
+        const url = $(this).attr('data-url');
+
+
+        $.ajax({
+            type: 'GET',
+            url: url,
+            success: function (response) {
+                console.log(response)
+                if (response.status === 'success') {
+                    $(`#hour-${response.id}`).remove();
+                }
+            }
+        })
+    }) */
+    $('.opening_hours').on('click', '.delete-opening-hour', function(e) {
+        e.preventDefault();
+
+        const url = $(this).attr('data-url');
+
+        $.ajax({
+            type: 'GET',
+            url: url,
+            success: function (response) {
+                console.log(response)
+                if (response.status === 'success') {
+                    $(`#hour-${response.id}`).remove();
+                }
+            }
+        })
+    })
 })

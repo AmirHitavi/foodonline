@@ -1,11 +1,13 @@
-from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
-from django.db.models import Prefetch, Q
-from django.http import JsonResponse
-from django.shortcuts import get_object_or_404, render
+from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.geos import GEOSGeometry
 from django.contrib.gis.measure import D
-from django.contrib.gis.db.models.functions import Distance
+from django.db.models import Prefetch, Q
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
+from datetime import datetime
+
+
 from marketplace import context_processors as market_context_processors
 from marketplace import models as market_models
 from menu import models as menu_models
@@ -26,6 +28,12 @@ def marketplace(request):
 
 def vendor_details(request, slug):
     vendor = get_object_or_404(vendor_models.Vendor, slug=slug)
+
+    opening_hours = vendor_models.OpeningHour.objects.filter(vendor=vendor).order_by("day", "-from_hour")
+
+    today = datetime.today().isoweekday()
+    current_opening_hours = vendor_models.OpeningHour.objects.filter(vendor=vendor, day=today).order_by('day', "-from_hour")
+
     categories = menu_models.Category.objects.prefetch_related(
         Prefetch(
             "fooditem_set",
@@ -39,7 +47,13 @@ def vendor_details(request, slug):
     else:
         cart_items = None
 
-    context = {"vendor": vendor, "categories": categories, "cart_items": cart_items}
+    context = {
+        "vendor": vendor,
+        "opening_hours": opening_hours,
+        "current_opening_hours": current_opening_hours,
+        "categories": categories,
+        "cart_items": cart_items
+    }
     return render(request, "marketplace/vendor_details.html", context)
 
 
@@ -225,7 +239,6 @@ def search(request):
         or not "lat" in request.GET
         or not "long" in request.GET
         or not "radius" in request.GET
-        or not ""
     ):
         return redirect("marketplace")
     else:

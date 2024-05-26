@@ -1,12 +1,12 @@
 from django.contrib import auth, messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.tokens import default_token_generator
+from django.contrib.gis.db.models.functions import Distance
+from django.contrib.gis.geos import GEOSGeometry
+from django.contrib.gis.measure import D
 from django.shortcuts import redirect, render
 from django.template.defaultfilters import slugify
 from django.utils.http import urlsafe_base64_decode
-from django.contrib.gis.geos import GEOSGeometry
-from django.contrib.gis.measure import D
-from django.contrib.gis.db.models.functions import Distance
 
 from accounts import forms as accounts_forms
 from accounts import models as accounts_models
@@ -22,16 +22,16 @@ from .utils import (
 
 
 def get_or_set_current_location(request):
-    if 'lat' in request.session:
-        lat = request.session['lat']
-        lng = request.session['lng']
+    if "lat" in request.session:
+        lat = request.session["lat"]
+        lng = request.session["lng"]
         return lng, lat
-    elif 'lat' in request.GET:
-        lat = request.GET.get('lat')
-        lng = request.GET.get('lng')
+    elif "lat" in request.GET:
+        lat = request.GET.get("lat")
+        lng = request.GET.get("lng")
 
-        request.session['lat'] = lat
-        request.session['lng'] = lng
+        request.session["lat"] = lat
+        request.session["lng"] = lng
         return lng, lat
     else:
         return None
@@ -40,12 +40,13 @@ def get_or_set_current_location(request):
 def index(request):
     if get_or_set_current_location(request) is not None:
 
-        point = GEOSGeometry('POINT(%s %s)' % (get_or_set_current_location(request)))
+        point = GEOSGeometry("POINT(%s %s)" % (get_or_set_current_location(request)))
 
         vendors = (
             vendor_models.Vendor.objects.filter(
                 user_profile__location__distance_lte=(point, D(km=100)),
-                user__is_active=True, is_approved=True
+                user__is_active=True,
+                is_approved=True,
             )
             .annotate(distance=Distance("user_profile__location", point))
             .order_by("distance")

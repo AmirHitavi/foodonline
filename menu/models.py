@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.text import slugify
+
 from vendor import models as vendor_models
 
 # Create your models here.

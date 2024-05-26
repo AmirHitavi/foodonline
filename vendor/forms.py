@@ -14,3 +14,10 @@ class VendorForm(forms.ModelForm):
     class Meta:
         model = vendor_models.Vendor
         fields = ["name", "license"]
+
+
+class OpeningHoursForm(forms.ModelForm):
+
+    class Meta:
+        model = vendor_models.OpeningHour
+        fields = ["day", "from_hour", "to_hour", "is_closed"]
