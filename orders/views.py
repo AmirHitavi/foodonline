@@ -10,6 +10,8 @@ from orders import forms as orders_forms
 from orders import models as orders_models
 from orders.utils import generate_order_number
 
+import simplejson as json
+
 # Create your views here.
 
 

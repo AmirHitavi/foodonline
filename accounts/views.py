@@ -12,6 +12,7 @@ from accounts import forms as accounts_forms
 from accounts import models as accounts_models
 from vendor import forms as vendor_forms
 from vendor import models as vendor_models
+from orders import models as orders_models
 
 from .utils import (
     check_role_customer,
@@ -175,7 +176,12 @@ def my_account(request):
 @login_required(login_url="login")
 @user_passes_test(check_role_customer)
 def customer_dashboard(request):
-    return render(request, "accounts/customer_dashboard.html")
+    orders = orders_models.Order.objects.filter(user=request.user, is_ordered=True)
+    context = {
+        "recent_orders": orders.order_by('-created_at')[:10],
+        "orders_count": orders.count()
+    }
+    return render(request, "accounts/customer_dashboard.html", context)
 
 
 @login_required(login_url="login")
