@@ -3,55 +3,62 @@
 <html lang="en">
 
 <head>
-	<meta charset="utf-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>{% block title %}FoodOnline{% endblock title %}</title>
-	<!-- Google Font Family Link Start -->
-	<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Montserrat:400,700">
-	<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700,800">
-	<!-- Google Font Family Link End -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}FoodOnline{% endblock title %}</title>
+    <!-- Google Font Family Link Start -->
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Montserrat:400,700">
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Open+Sans:400,700,800">
+    <!-- Google Font Family Link End -->
 
-	<!-- CSS -->
-	<link href="{% static 'assets/css/iconmoon.css' %}" rel="stylesheet">
-	<link href="{% static 'assets/css/style.css' %}" rel="stylesheet">
-	<link href="{% static 'assets/css/cs-foodbakery-plugin.css' %}" rel="stylesheet">
-	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-	<link href="{% static 'assets/css/bootstrap-slider.css' %}" rel="stylesheet">
+    <!-- CSS -->
+    <link href="{% static 'assets/css/iconmoon.css' %}" rel="stylesheet">
+    <link href="{% static 'assets/css/style.css' %}" rel="stylesheet">
+    <link href="{% static 'assets/css/cs-foodbakery-plugin.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link href="{% static 'assets/css/bootstrap-slider.css' %}" rel="stylesheet">
     <link href="{% static 'assets/css/custom.css' %}" rel="stylesheet">
-	<!-- JAVASCRIPT -->
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-	<script src="{% static 'assets/js/modernizr.js' %}"></script>
-	<script src="{% static 'assets/js/bootstrap.js' %}"></script>
+    <!-- JAVASCRIPT -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="{% static 'assets/js/modernizr.js' %}"></script>
+    <script src="{% static 'assets/js/bootstrap.js' %}"></script>
     <script src="{% static 'assets/js/custom.js' %}"></script>
     <!-- Google -->
     {% if '/' == request.path or 'profile' in request.path %}
-        <script src="https://maps.googleapis.com/maps/api/js?key=&libraries=places&callback=initAutoComplete" defer></script>
-	{% endif %}
+        <script src="https://maps.googleapis.com/maps/api/js?key=&libraries=places&callback=initAutoComplete"
+                defer></script>
+    {% endif %}
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <!-- Sweet Alert -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- PayPal JavaScript PayPal -->
+    <script src="https://www.paypal.com/sdk/js?client-id={{ PAYPAL_CLIENT_ID }}&currency=USD"></script>
+
     <style>
-		body, .main-section p, .mce-content-body p{
-			font:Normal  14px/24px "Open Sans", sans-serif;letter-spacing: 0px;text-transform: none;color: #515151 !important;
-		}
-	</style>
+        body, .main-section p, .mce-content-body p {
+            font: Normal 14px/24px "Open Sans", sans-serif;
+            letter-spacing: 0px;
+            text-transform: none;
+            color: #515151 !important;
+        }
+    </style>
 </head>
 
 <body>
-	<!--Main Wrapper-->
-	<div class="wrapper">
-        <!-- Header Loads Here -->
-        {% include 'includes/header.html' %}
-		<!-- Main Section Start -->
-		{% block content %} {% endblock content %}
-		<!-- Main Section End -->
-        <!-- Footer Loads Here -->
-        {% include 'includes/footer.html' %}
-	</div>
-	<!-- Modal Popup End -->
-	<script src="{% static 'assets/js/scripts.js' %}"></script>
-	<script src="{% static 'assets/js/functions.js' %}"></script>
+<!--Main Wrapper-->
+<div class="wrapper">
+    <!-- Header Loads Here -->
+    {% include 'includes/header.html' %}
+    <!-- Main Section Start -->
+    {% block content %} {% endblock content %}
+    <!-- Main Section End -->
+    <!-- Footer Loads Here -->
+    {% include 'includes/footer.html' %}
+</div>
+<!-- Modal Popup End -->
+<script src="{% static 'assets/js/scripts.js' %}"></script>
+<script src="{% static 'assets/js/functions.js' %}"></script>
 </body>
 </html>

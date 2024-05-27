@@ -29,7 +29,8 @@
                                                     {% for cart_item in cart_items %}
                                                         <li id="cart-item-{{ cart_item.id }}">
                                                             <div class="image-holder">
-                                                                <img src="{{ cart_item.food_item.image.url }}" alt="{{ cart_item.food_item.food_title }}'s picture">
+                                                                <img src="{{ cart_item.food_item.image.url }}"
+                                                                     alt="{{ cart_item.food_item.food_title }}'s picture">
                                                             </div>
                                                             <div class="text-holder">
                                                                 <h6>
@@ -129,7 +130,7 @@
                                                         <span id="grand_total">{{ grand_total }}</span>
                                                     </span>
                                                 </li>
-                                                <a href="" class="btn btn-danger w-100 p-2 mt-3">PROCEED TO CHECKOUT</a>
+                                                <a href="{% url 'checkout' %}" class="btn btn-danger w-100 p-2 mt-3">PROCEED TO CHECKOUT</a>
                                             </ul>
                                         </div>
                                     </div>

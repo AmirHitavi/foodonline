@@ -8,9 +8,12 @@ from django.db.models import Prefetch, Q
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
+from accounts import models as accounts_models
 from marketplace import context_processors as market_context_processors
 from marketplace import models as market_models
 from menu import models as menu_models
+from orders import forms as orders_forms
+from orders import models as orders_models
 from vendor import models as vendor_models
 
 # Create your views here.
@@ -286,3 +289,32 @@ def search(request):
         }
 
         return render(request, "marketplace/marketplace.html", context)
+
+
+@login_required(login_url="login")
+def checkout(request):
+    cart_items = market_models.Cart.objects.filter(user=request.user).order_by(
+        "created_at"
+    )
+    if cart_items.count() <= 0:
+        return redirect("marketplace")
+
+    user_profile = accounts_models.UserProfile.objects.get(user=request.user)
+
+    default_values = {
+        "first_name": request.user.first_name,
+        "last_name": request.user.last_name,
+        "phone": request.user.phone,
+        "email": request.user.email,
+        "address": user_profile.address,
+        "country": user_profile.country,
+        "state": user_profile.state,
+        "city": user_profile.city,
+        "pin_code": user_profile.pin_code,
+    }
+
+    form = orders_forms.OrderForm(initial=default_values)
+    print("errors", form.errors)
+
+    context = {"form": form, "cart_items": cart_items}
+    return render(request, "marketplace/checkout.html", context)

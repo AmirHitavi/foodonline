@@ -2,6 +2,7 @@ from django.conf import settings
 
 from accounts import models as accounts_models
 
+
 def get_google_api(request):
     return dict(GOOGLE_API_KEY=settings.GOOGLE_API)
 

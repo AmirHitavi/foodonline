@@ -59,7 +59,6 @@ class Vendor(models.Model):
             if not current_hour.is_closed:
                 start = current_hour.from_hour
                 end = current_hour.to_hour
-
                 if start <= now <= end:
                     is_open = True
                     break
@@ -72,7 +71,11 @@ class Vendor(models.Model):
             original_object = Vendor.objects.get(pk=self.pk)
             if original_object.is_approved != self.is_approved:
                 email_template = "emails/admin_approval_email.html"
-                context = {"user": self.user, "is_approved": self.is_approved}
+                context = {
+                    "user": self.user,
+                    "is_approved": self.is_approved,
+                    "to_email": self.user.email,
+                }
                 if self.is_approved:
                     # send notification email
                     mail_subject = "Congratulations! Your restaurant has been approved."

@@ -12,5 +12,8 @@ class CartAdmin(admin.ModelAdmin):
 
 @admin.register(Tax)
 class TaxAdmin(admin.ModelAdmin):
-    list_display = ["tax_type", "tax_percentage", "is_active",]
-
+    list_display = [
+        "tax_type",
+        "tax_percentage",
+        "is_active",
+    ]

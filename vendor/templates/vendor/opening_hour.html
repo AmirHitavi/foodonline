@@ -21,30 +21,30 @@
                                 <hr>
                                 <table class="table opening_hours">
                                     <tbody>
-                                        {% for hour in opening_hours %}
-                                            <tr id="hour-{{ hour.id }}">
-                                                <td>
-                                                    <b>
-                                                        {{ hour | title }}
-                                                    </b>
-                                                </td>
-                                                <td>
-                                                    {% if hour.is_closed %}
-                                                        closed
-                                                    {% else %}
-                                                        {{ hour.from_hour }} - {{ hour.to_hour }}
-                                                    {% endif %}
-                                                </td>
-                                                <td>
-                                                    <a href="{% url 'delete-opening-hour' hour.id %}"
-                                                       class="delete-opening-hour"
-                                                       data-url="{% url 'delete-opening-hour' hour.id %}"
-                                                    >
-                                                        Remove
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                        {% endfor %}
+                                    {% for hour in opening_hours %}
+                                        <tr id="hour-{{ hour.id }}">
+                                            <td>
+                                                <b>
+                                                    {{ hour | title }}
+                                                </b>
+                                            </td>
+                                            <td>
+                                                {% if hour.is_closed %}
+                                                    closed
+                                                {% else %}
+                                                    {{ hour.from_hour }} - {{ hour.to_hour }}
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <a href="{% url 'delete-opening-hour' hour.id %}"
+                                                   class="delete-opening-hour"
+                                                   data-url="{% url 'delete-opening-hour' hour.id %}"
+                                                >
+                                                    Remove
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
                                     </tbody>
                                 </table>
 
@@ -55,7 +55,8 @@
                                     <div class="col-md-2">{{ form.to_hour }}</div>
                                     <div class="col-md-3">{{ form.is_closed }} Set as closed</div>
                                     <div class="col-md-2">
-                                        <input type="hidden" id="add-opening-hour-url" value="{% url 'add-opening-hour' %}">
+                                        <input type="hidden" id="add-opening-hour-url"
+                                               value="{% url 'add-opening-hour' %}">
                                         <button class="btn btn-success add-opening-hour">Add Hours</button>
                                     </div>
                                 </form>
