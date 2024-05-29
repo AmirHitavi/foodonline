@@ -6,11 +6,10 @@ from django.shortcuts import redirect, render
 from accounts.utils import send_notification_email
 from marketplace import context_processors as market_context_processors
 from marketplace import models as market_models
+from menu import models as menu_models
 from orders import forms as orders_forms
 from orders import models as orders_models
 from orders.utils import generate_order_number
-
-import simplejson as json
 
 # Create your views here.
 
@@ -20,6 +19,39 @@ def place_order(request):
     cart_items = market_models.Cart.objects.filter(user=request.user)
     if cart_items.count() <= 0:
         return redirect("marketplace")
+
+    vendor_ids = []
+    for cart_item in cart_items:
+        if cart_item.food_item.vendor.id not in vendor_ids:
+            vendor_ids.append(cart_item.food_item.vendor.id)
+
+    # {"vendor_id": {"sub_total": {"tax_type": {"tax_percentage": "tax_amount"}}}}
+    data = {}
+    sub_total = 0
+    taxes = market_models.Tax.objects.filter(is_active=True)
+    total_data_dict = {}
+
+    for cart_item in cart_items:
+        food_item = menu_models.FoodItem.objects.get(
+            pk=cart_item.food_item.id, vendor_id__in=vendor_ids
+        )
+
+        vendor_id = food_item.vendor.id
+        if vendor_id in data:
+            sub_total = data[vendor_id]
+            sub_total += food_item.price * cart_item.quantity
+            data[vendor_id] = sub_total
+        else:
+            sub_total = food_item.price * cart_item.quantity
+            data[vendor_id] = sub_total
+
+        tax_dict = {}
+        for tax in taxes:
+            tax_type = tax.tax_type
+            tax_percentage = tax.tax_percentage
+            tax_amount = round((tax_percentage * sub_total) / 100, 2)
+            tax_dict.update({tax_type: {str(tax_percentage): str(tax_amount)}})
+        total_data_dict.update({vendor_id: {str(sub_total): tax_dict}})
 
     sub_total = market_context_processors.get_cart_amounts(request)["sub_total"]
     tax_data = market_context_processors.get_cart_amounts(request)["tax_dict"]
@@ -48,8 +80,9 @@ def place_order(request):
             order.payment_method = request.POST.get("payment_method")
             order.save()
             order.order_number = generate_order_number(order.id)
+            order.vendors.add(*vendor_ids)
+            order.total_data = json.dumps(total_data_dict)
             order.save()
-
             context = {"order": order, "cart_items": cart_items, "sub_total": sub_total}
             return render(request, "orders/place_order.html", context)
 
@@ -128,36 +161,39 @@ def payment(request):
         cart_items.delete()
 
         response = {
-            'order_number': order_number,
-            'transaction_id': transaction_id,
+            "order_number": order_number,
+            "transaction_id": transaction_id,
         }
 
         return JsonResponse(response)
 
 
 def order_complete(request):
-    order_number = request.GET.get('order_no')
-    transaction_id = request.GET.get('tx_id')
+    order_number = request.GET.get("order_no")
+    transaction_id = request.GET.get("tx_id")
 
     try:
-        order = orders_models.Order.objects.get(order_number=order_number, payment__transaction_id=transaction_id, is_ordered=True)
+        order = orders_models.Order.objects.get(
+            order_number=order_number,
+            payment__transaction_id=transaction_id,
+            is_ordered=True,
+        )
         ordered_food = orders_models.OrderedFood.objects.filter(order=order)
 
         sub_total = 0
         for item in ordered_food:
-            sub_total += (item.price * item.quantity)
+            sub_total += item.price * item.quantity
 
         tax_data = json.loads(order.tax_data)
 
         context = {
-            'order': order,
-            'ordered_food': ordered_food,
-            'sub_total': sub_total,
-            'tax_data': tax_data
+            "order": order,
+            "ordered_food": ordered_food,
+            "sub_total": sub_total,
+            "tax_data": tax_data,
         }
 
-        return render(request, 'orders/order_complete.html', context)
+        return render(request, "orders/order_complete.html", context)
 
     except orders_models.Order.DoesNotExist:
-        return redirect('index')
-
+        return redirect("index")

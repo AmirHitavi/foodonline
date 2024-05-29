@@ -1,3 +1,5 @@
+import datetime
+
 from django.contrib import auth, messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.tokens import default_token_generator
@@ -10,9 +12,9 @@ from django.utils.http import urlsafe_base64_decode
 
 from accounts import forms as accounts_forms
 from accounts import models as accounts_models
+from orders import models as orders_models
 from vendor import forms as vendor_forms
 from vendor import models as vendor_models
-from orders import models as orders_models
 
 from .utils import (
     check_role_customer,
@@ -55,11 +57,9 @@ def index(request):
         for vendor in vendors:
             vendor.kms = round(vendor.distance.km, 1)
     else:
-        print("else")
         vendors = vendor_models.Vendor.objects.filter(
             user__is_active=True, is_approved=True
         )
-    print(vendors)
 
     context = {"top_vendors": vendors[:8], "popular_vendors": vendors[:8]}
     return render(request, "accounts/index.html", context)
@@ -176,10 +176,12 @@ def my_account(request):
 @login_required(login_url="login")
 @user_passes_test(check_role_customer)
 def customer_dashboard(request):
-    orders = orders_models.Order.objects.filter(user=request.user, is_ordered=True)
+    orders = orders_models.Order.objects.filter(
+        user=request.user, is_ordered=True
+    ).order_by("-created_at")
     context = {
-        "recent_orders": orders.order_by('-created_at')[:10],
-        "orders_count": orders.count()
+        "recent_orders": orders[:10],
+        "orders_count": orders.count(),
     }
     return render(request, "accounts/customer_dashboard.html", context)
 
@@ -187,7 +189,32 @@ def customer_dashboard(request):
 @login_required(login_url="login")
 @user_passes_test(check_role_vendor)
 def vendor_dashboard(request):
-    return render(request, "accounts/vendor_dashboard.html")
+    vendor = vendor_models.Vendor.objects.get(user=request.user)
+    orders = orders_models.Order.objects.filter(
+        vendors__in=[vendor.id], is_ordered=True
+    ).order_by("-created_at")
+
+    total_revenue = 0
+
+    for order in orders:
+        total_revenue += order.get_total_by_vendor()["grand_total"]
+
+    month_revenue = 0
+    current_month = datetime.datetime.now().month
+    current_month_orders = orders_models.Order.objects.filter(
+        vendors__in=[vendor.id], is_ordered=True, created_at__month=current_month
+    ).order_by("-created_at")
+
+    for order in current_month_orders:
+        month_revenue += order.get_total_by_vendor()["grand_total"]
+
+    context = {
+        "recent_orders": orders[:10],
+        "orders_count": orders.count(),
+        "total_revenue": total_revenue,
+        "month_revenue": month_revenue,
+    }
+    return render(request, "accounts/vendor_dashboard.html", context)
 
 
 def activate(request, uidb64, token):

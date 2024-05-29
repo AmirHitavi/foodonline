@@ -314,7 +314,6 @@ def checkout(request):
     }
 
     form = orders_forms.OrderForm(initial=default_values)
-    print("errors", form.errors)
 
     context = {"form": form, "cart_items": cart_items}
     return render(request, "marketplace/checkout.html", context)

@@ -39,4 +39,10 @@ urlpatterns = [
         views.delete_opening_hour,
         name="delete-opening-hour",
     ),
+    path(
+        "order-details/<int:order_number>/",
+        views.order_details,
+        name="vendor-order-details",
+    ),
+    path("my-orders/", views.my_orders, name="vendor-my-orders"),
 ]

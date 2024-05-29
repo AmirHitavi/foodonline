@@ -10,6 +10,7 @@ from accounts import models as accounts_models
 from accounts.utils import check_role_vendor
 from menu import forms as menu_forms
 from menu import models as menu_models
+from orders import models as orders_models
 from vendor import forms as vendor_forms
 from vendor import models as vendor_models
 
@@ -152,8 +153,6 @@ def add_food(request):
 
             messages.success(request, "Food added successfully!")
             return redirect("menu-builder-category", food_item.category.slug)
-        else:
-            print(form.errors)
 
     context = {"form": form}
     return render(request, "vendor/add_food.html", context)
@@ -278,3 +277,42 @@ def delete_opening_hour(request, id):
             )
     else:
         return JsonResponse({"status": "failed", "message": "Invalid request!"})
+
+
+@login_required(login_url="login")
+@user_passes_test(check_role_vendor)
+def order_details(request, order_number):
+    try:
+        order = orders_models.Order.objects.get(
+            order_number=order_number, is_ordered=True
+        )
+        ordered_foods = orders_models.OrderedFood.objects.filter(
+            order=order, food_item__vendor=get_vendor(request)
+        )
+
+        vendor_info = order.get_total_by_vendor()
+
+        context = {
+            "order": order,
+            "ordered_foods": ordered_foods,
+            "sub_total": vendor_info["sub_total"],
+            "tax_data": vendor_info["tax_dict"],
+            "grand_total": vendor_info["grand_total"],
+        }
+        return render(request, "vendor/order_details.html", context)
+
+    except orders_models.Order.DoesNotExist:
+        return redirect("vendor")
+
+
+@login_required(login_url="login")
+@user_passes_test(check_role_vendor)
+def my_orders(request):
+    vendor = get_vendor(request)
+    orders = orders_models.Order.objects.filter(
+        vendors__in=[vendor.id], is_ordered=True
+    )
+
+    context = {"orders": orders, "orders_count": orders.count()}
+
+    return render(request, "vendor/my_orders.html", context)
